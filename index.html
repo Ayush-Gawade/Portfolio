@@ -474,81 +474,67 @@
 
   <!-- ALL JS (embedded) -->
   <script>
-    // ===== small utility: add current year =====
-    document.getElementById('year').textContent = new Date().getFullYear();
+(function particleBackground(){
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // ===== detect if device is touch-capable and toggle classes =====
-    (function detectTouch(){
-      const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-      if(isTouch){
-        document.documentElement.classList.add('is-touch');
-        document.body.classList.add('is-touch');
-      } else {
-        document.documentElement.classList.add('no-touch');
-      }
-    })();
+  // OPTIONAL: if you prefer the CSS gradient above, skip this script.
+  const useCanvas = false; // set to true to enable canvas particles
+  if(!useCanvas) return;
 
-    // ===== reveal on scroll using IntersectionObserver =====
-    (function revealOnScroll(){
-      const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if(entry.isIntersecting){
-            entry.target.classList.add('show');
-            obs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.12 });
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.inset = '0';
+  canvas.style.zIndex = '-3';
+  canvas.style.pointerEvents = 'none';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
 
-      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-    })();
+  let w = canvas.width = innerWidth;
+  let h = canvas.height = innerHeight;
+  const particles = [];
+  const COUNT = Math.round(Math.min(90, Math.max(30, (w*h)/90000)));
 
-    // ===== smooth scroll for internal anchors (native fallback) =====
-    (function smoothAnchors(){
-      document.querySelectorAll('a[href^="#"]').forEach(a=>{
-        a.addEventListener('click', function(e){
-          const id = this.getAttribute('href');
-          if(id.length > 1){
-            e.preventDefault();
-            const target = document.querySelector(id);
-            if(target){
-              target.scrollIntoView({behavior:'smooth', block:'start'});
-              // update URL hash without jumping
-              history.replaceState(null, '', id);
-            }
-          }
-        });
-      });
-    })();
+  function rand(min, max){ return Math.random()*(max-min)+min; }
 
-    // ===== subtle parallax on mouse move for hero (desktop only) =====
-    (function heroParallax(){
-      const hero = document.querySelector('.hero-inner');
-      if(!hero) return;
-      if(document.documentElement.classList.contains('is-touch')) return; // disable on touch
+  for(let i=0;i<COUNT;i++){
+    particles.push({
+      x: rand(0,w),
+      y: rand(0,h),
+      r: rand(0.4,1.6),
+      vx: rand(-0.05,0.05),
+      vy: rand(-0.02,0.02),
+      alpha: rand(0.06,0.22)
+    });
+  }
 
-      document.addEventListener('mousemove', function(e){
-        const w = window.innerWidth, h = window.innerHeight;
-        const cx = (e.clientX - w/2) / (w/2);
-        const cy = (e.clientY - h/2) / (h/2);
-        const tx = cx * 6; // translate amount
-        const ty = cy * 6;
-        hero.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
-      });
+  function resize(){
+    w = canvas.width = innerWidth; h = canvas.height = innerHeight;
+  }
+  addEventListener('resize', resize);
 
-      // reset when leaving
-      document.addEventListener('mouseleave', ()=> hero.style.transform = '');
-      window.addEventListener('blur', ()=> hero.style.transform = '');
-    })();
+  let last = 0;
+  function step(ts){
+    const dt = Math.min(50, ts - last); last = ts;
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p => {
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      if(p.x < -10) p.x = w + 10;
+      if(p.x > w + 10) p.x = -10;
+      if(p.y < -10) p.y = h + 10;
+      if(p.y > h + 10) p.y = -10;
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(255,200,210,'+p.alpha+')';
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+    });
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+})();
+</script>
 
-    // ===== accessibility: reduce motion if prefers-reduced-motion =====
-    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      document.querySelectorAll('.reveal').forEach(el => {
-        el.style.transition = 'none';
-        el.classList.add('show');
-      });
-      document.querySelector('.bg').style.animation = 'none';
-    }
-  </script>
 </body>
 </html>
+
 
