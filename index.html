@@ -36,30 +36,59 @@
     /* -------------------------
        Moving background (stardust-like)
        ------------------------- */
-    .bg {
+     .bg {
       position: fixed;
       inset: 0;
-      z-index: -2;
-      background: radial-gradient(circle at 10% 10%, rgba(216, 208, 208, 0.06) 0.5px, transparent 1px),
-                  radial-gradient(circle at 40% 80%, rgba(212, 202, 203, 0.04) 0.6px, transparent 1px),
-                  linear-gradient(180deg, rgba(243, 234, 234, 0.01), rgba(0,0,0,0.05));
-      background-size: 40px 40px, 60px 60px, cover;
-      animation: drift 70s linear infinite;
-      opacity:0.95;
+      z-index: -3;
+      /* stronger star dots + deeper gradient to be visible */
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,210,220,0.12) 0.9px, transparent 1px),
+        radial-gradient(circle at 60% 70%, rgba(255,200,210,0.08) 0.9px, transparent 1px),
+        linear-gradient(180deg, rgba(240,220,230,0.06), rgba(0,0,0,0.12));
+      background-size: 30px 30px, 50px 50px, cover;
+      opacity: 1;
       transform-origin:center;
+      will-change: transform, background-position;
+      animation: bg-drift 70s linear infinite;
     }
-    @keyframes drift {
+    @keyframes bg-drift {
       from { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
-      to   { transform: translate3d(-700px,-450px,0) rotate(20deg) scale(1.05); }
+      to   { transform: translate3d(-520px,-360px,0) rotate(16deg) scale(1.03); }
     }
 
-    /* soft gradient overlay */
+    /* conic overlay (accent color) — visible but soft */
+    .bg::before{
+      content:"";
+      position:absolute; inset:0; z-index:-2; pointer-events:none;
+      background: conic-gradient(from 200deg, rgba(192,72,90,0.06), rgba(255,200,200,0.04), rgba(160,160,200,0.04));
+      mix-blend-mode: overlay;
+      opacity: 1;
+      filter: blur(60px) saturate(1.05);
+      animation: conic-rotate 28s linear infinite;
+    }
+    @keyframes conic-rotate {
+      to { transform: rotate(360deg); }
+    }
+
+    /* star layer — slightly denser and visible */
     .bg::after{
       content:"";
-      position:absolute; inset:0;
-      background: radial-gradient(600px 400px at 10% 10%, rgba(255,182,193,0.03), transparent 10%),
-                  radial-gradient(500px 300px at 85% 85%, rgba(255,182,193,0.02), transparent 10%);
-      z-index:-1;
+      position:absolute; inset:0; z-index:-4; pointer-events:none;
+      background:
+        radial-gradient(circle at 8% 15%, rgba(255,255,255,0.06) 0.6px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 0.8px, transparent 1px);
+      background-size: 28px 28px, 48px 48px;
+      transform: translateZ(0);
+      animation: starLayer 90s linear infinite;
+    }
+    @keyframes starLayer {
+      from { background-position: 0 0, 0 0; }
+      to   { background-position: -800px -600px, 700px 500px; }
+    }
+
+    /* respects prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .bg, .bg::before, .bg::after { animation: none !important; transform: none !important; }
     }
 
     /* page container */
@@ -452,3 +481,4 @@
   </script>
 </body>
 </html>
+
