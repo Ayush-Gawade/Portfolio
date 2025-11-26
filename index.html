@@ -18,7 +18,21 @@
       --radius: 14px;
       --transition: 350ms cubic-bezier(.2,.9,.2,1);
       --max-width:1100px;
+
+      /* background tuning */
+      --star-1-opacity: 0.18;
+      --star-2-opacity: 0.10;
+      --bg-drift-duration: 60s;
+      --conic-rotate-duration: 24s;
+      --star-layer-duration: 78s;
+      --bg-parallax-strength: 18;   /* px max translate for background (desktop) */
+      --star-parallax-strength: 36; /* foreground stars move more */
+      --bg-tx: 0px;
+      --bg-ty: 0px;
+      --star-x: 0px;
+      --star-y: 0px;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
@@ -31,62 +45,63 @@
       overflow-x:hidden;
       line-height:1.45;
       -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing:antialiased;
     }
 
     /* -------------------------
        Moving background (stardust-like)
        ------------------------- */
-     .bg {
+    .bg {
       position: fixed;
       inset: 0;
       z-index: -3;
-      /* stronger star dots + deeper gradient to be visible */
+      pointer-events:none;
       background:
-        radial-gradient(circle at 12% 18%, rgba(255,210,220,0.12) 0.9px, transparent 1px),
-        radial-gradient(circle at 60% 70%, rgba(255,200,210,0.08) 0.9px, transparent 1px),
-        linear-gradient(180deg, rgba(240,220,230,0.06), rgba(0,0,0,0.12));
-      background-size: 30px 30px, 50px 50px, cover;
+        radial-gradient(circle at 12% 18%, rgba(255,210,220,var(--star-1-opacity)) 0.9px, transparent 1px),
+        radial-gradient(circle at 60% 70%, rgba(255,200,210,0.08) 1.1px, transparent 1px),
+        linear-gradient(180deg, rgba(240,220,230,0.08), rgba(0,0,0,0.18));
+      background-size: 24px 24px, 48px 48px, cover;
       opacity: 1;
       transform-origin:center;
       will-change: transform, background-position;
-      animation: bg-drift 70s linear infinite;
+      animation: bg-drift var(--bg-drift-duration) linear infinite;
+      transform: translate3d(var(--bg-tx), var(--bg-ty), 0);
     }
     @keyframes bg-drift {
-      from { transform: translate3d(0,0,0) rotate(0deg) scale(1); }
-      to   { transform: translate3d(-520px,-360px,0) rotate(16deg) scale(1.03); }
+      from { background-position: 0 0, 0 0, 0 0; }
+      to   { background-position: -520px -360px, 400px 300px, 0 0; }
     }
 
-    /* conic overlay (accent color) — visible but soft */
     .bg::before{
       content:"";
       position:absolute; inset:0; z-index:-2; pointer-events:none;
-      background: conic-gradient(from 200deg, rgba(192,72,90,0.06), rgba(255,200,200,0.04), rgba(160,160,200,0.04));
+      background: conic-gradient(from 200deg, rgba(192,72,90,0.08), rgba(255,200,200,0.05), rgba(160,160,200,0.05));
       mix-blend-mode: overlay;
       opacity: 1;
-      filter: blur(60px) saturate(1.05);
-      animation: conic-rotate 28s linear infinite;
+      filter: blur(40px) saturate(1.05);
+      animation: conic-rotate var(--conic-rotate-duration) linear infinite;
+      will-change: transform;
+      transform: translate3d(calc(var(--bg-tx) / 1.8), calc(var(--bg-ty) / 1.8), 0);
     }
-    @keyframes conic-rotate {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes conic-rotate { to { transform: rotate(360deg) } }
 
-    /* star layer — slightly denser and visible */
     .bg::after{
       content:"";
       position:absolute; inset:0; z-index:-4; pointer-events:none;
       background:
-        radial-gradient(circle at 8% 15%, rgba(255,255,255,0.06) 0.6px, transparent 1px),
-        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.04) 0.8px, transparent 1px);
-      background-size: 28px 28px, 48px 48px;
-      transform: translateZ(0);
-      animation: starLayer 90s linear infinite;
+        radial-gradient(circle at 8% 15%, rgba(255,255,255,var(--star-2-opacity)) 0.7px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 0.9px, transparent 1px);
+      background-size: 20px 20px, 44px 44px;
+      transform: translate3d(var(--star-x), var(--star-y), 0);
+      animation: starLayer var(--star-layer-duration) linear infinite;
+      will-change: transform, background-position;
     }
     @keyframes starLayer {
       from { background-position: 0 0, 0 0; }
-      to   { background-position: -800px -600px, 700px 500px; }
+      to   { background-position: -900px -700px, 700px 500px; }
     }
 
-    /* respects prefers-reduced-motion */
+    /* preferences */
     @media (prefers-reduced-motion: reduce) {
       .bg, .bg::before, .bg::after { animation: none !important; transform: none !important; }
     }
@@ -107,7 +122,7 @@
       padding:8px 0 24px;
       position:sticky;
       top:0;
-      z-index:5;
+      z-index:50;
       backdrop-filter: blur(6px);
       background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
     }
@@ -132,9 +147,17 @@
     }
     .nav a:hover{ color:#fff; background: rgba(255,182,193,0.06); box-shadow:0 6px 20px rgba(255,182,193,0.03) }
 
+    /* hamburger (mobile) */
+    .menu-btn{
+      display:none;
+      background:transparent;border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px;
+      width:44px;height:44px; align-items:center; justify-content:center; cursor:pointer;
+    }
+    .menu-btn:focus{ outline:3px solid rgba(192,72,90,0.12); outline-offset:3px }
+
     /* Hero */
     .hero{
-      min-height:70vh;
+      min-height:68vh;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -150,10 +173,15 @@
       border-radius:var(--radius);
       box-shadow: 0 10px 30px rgba(0,0,0,0.6);
       transition:transform 450ms ease, box-shadow 450ms ease;
+      will-change: transform;
+      transform: translate3d(0,0,0);
     }
     /* On small screens stack vertically */
     @media (max-width:820px){
-      .hero-inner{flex-direction:column; text-align:center}
+      .menu-btn{ display:inline-flex }
+      .nav{ display:none; position:absolute; right:20px; top:72px; flex-direction:column; background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25)); padding:10px; border-radius:12px; }
+      .nav.open{ display:flex; }
+      .hero-inner{flex-direction:column; text-align:center; padding:20px;}
     }
 
     .avatar {
@@ -186,6 +214,7 @@
       box-shadow: 0 8px 28px rgba(255,182,193,0.06);
       transition: transform 220ms var(--transition), box-shadow 280ms var(--transition), background 220ms var(--transition), color 220ms var(--transition);
       user-select:none;
+      min-height:40px;
     }
     .btn .icon{width:18px;height:18px;display:inline-grid;place-items:center;opacity:0.95}
     .btn:hover{
@@ -193,6 +222,12 @@
       background: var(--accent);
       color: white;
       box-shadow: 0 20px 40px rgba(255,182,193,0.18), 0 1px 0 rgba(255,255,255,0.02) inset;
+    }
+
+    /* ensure tappable sizes on mobile */
+    @media (max-width:820px){
+      .btn{ min-height:44px; padding:12px 16px; font-size:15px }
+      .icon-btn{ width:48px; height:48px; }
     }
 
     /* subtle hover glow for desktop (but not on touch) */
@@ -225,12 +260,43 @@
       .avatar{ width:120px;height:120px; border-radius:14px }
     }
 
-    /* skill pill */
-    .pill{
-      display:inline-block;padding:8px 12px;border-radius:999px;background:var(--glass);
-      color:var(--muted); margin:6px 6px 6px 0; font-weight:600; font-size:13px;
-      border:1px solid rgba(255,255,255,0.02)
+    /* Experience timeline */
+    .timeline{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:18px;
     }
+    .exp-item{ background: rgba(255,255,255,0.01); padding:14px; border-radius:10px; }
+    .exp-item h3{ margin:0; font-size:16px }
+    .exp-item .muted{ font-size:13px }
+    .exp-item ul{ margin:8px 0 0 18px; padding:0; color:var(--muted); font-size:14px }
+    @media (max-width:900px){ .timeline{ grid-template-columns:1fr } }
+
+    /* services */
+    .services{ display:grid; grid-template-columns: repeat(3, 1fr); gap:16px }
+    .service{ padding:18px; border-radius:12px; background: rgba(255,255,255,0.01); display:flex; flex-direction:column; gap:8px; align-items:flex-start; transition: transform 220ms var(--transition), box-shadow 220ms var(--transition) }
+    .service:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6) }
+    .service .icon{ width:44px;height:44px;border-radius:10px; display:inline-grid;place-items:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid rgba(255,255,255,0.02)}
+    .service h4{ margin:0 }
+    @media (max-width:1000px){ .services{ grid-template-columns: repeat(2,1fr) } }
+    @media (max-width:700px){ .services{ grid-template-columns:1fr } }
+
+    /* movie list */
+    .movie-list{ display:flex; flex-direction:column; gap:12px }
+    .movie-row{ display:flex; gap:12px; align-items:center; background: rgba(255,255,255,0.01); padding:10px; border-radius:10px }
+    .movie-thumb{ width:72px; height:100px; flex:0 0 72px; border-radius:8px; overflow:hidden; background:#111; display:grid; place-items:center }
+    .movie-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
+    .movie-meta{ flex:1; min-width:0 }
+    .movie-title{ font-weight:700; margin:0; font-size:15px }
+    .rating-control{ display:flex; gap:12px; align-items:center; margin-top:6px }
+    .rating-bar{ height:8px; width:120px; background: rgba(255,255,255,0.06); border-radius:999px; overflow:hidden }
+    .rating-fill{ height:100%; width:0%; background: linear-gradient(90deg,var(--accent), #ff9aa2); }
+    .rating-value{ min-width:44px; text-align:right; font-weight:700 }
+
+    form.add-movie{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+    form.add-movie input[type="text"], form.add-movie input[type="url"]{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:var(--muted); min-width:160px }
+    form.add-movie input[type="range"]{ width:120px }
+    form.add-movie button{ margin-left:6px }
 
     /* Fade-in on scroll (initial state) */
     .reveal{
@@ -260,13 +326,17 @@
     }
     .icon-btn:hover{ color: #fff; transform: translateY(-4px); background:var(--accent); box-shadow:0 12px 30px rgba(255,182,193,0.12) }
 
-    /* focus-visible */
-    a:focus, button:focus { outline: 3px solid rgba(255,182,193,0.12); outline-offset:3px; border-radius:8px }
+    /* accessibility focus */
+    a:focus, button:focus, input:focus { outline: 3px solid rgba(255,182,193,0.12); outline-offset:3px; border-radius:8px }
 
-    /* small animation when pressing on touch */
-    .is-touch .btn:active, .is-touch .icon-btn:active{
-      transform: translateY(0) scale(0.995);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    /* low-powered / small screens: reduce background noise */
+    @media (max-width:520px){
+      :root{
+        --bg-parallax-strength: 6;
+        --star-parallax-strength: 10;
+      }
+      .bg{ background-size: 30px 30px, 60px 60px, cover; }
+      .bg::after{ background-size: 36px 36px, 72px 72px; }
     }
 
   </style>
@@ -280,16 +350,22 @@
       <div class="brand">
         <div class="logo" aria-hidden="true">AG</div>
         <div>
-          <!-- EDIT: Replace text with your display name -->
           <div style="font-weight:800">Ayush Gawade</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">Web • Software • Creator</div>
         </div>
       </div>
 
-      <nav class="nav" aria-label="Main navigation">
+      <button class="menu-btn" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+
+      <nav id="main-nav" class="nav" aria-label="Main navigation">
         <a href="#about">About</a>
         <a href="#skills">Skills</a>
         <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#services">Services</a>
+        <a href="#movies">Movies</a>
         <a href="#contact">Contact</a>
       </nav>
     </header>
@@ -298,17 +374,14 @@
     <section class="hero" role="banner" aria-labelledby="hero-title">
       <div class="hero-inner reveal" style="--r:1">
         <div class="avatar" aria-hidden="false">
-          <!-- EDIT: Change avatar src below -->
           <img src="https://i.pinimg.com/736x/95/db/ad/95dbad6eeabfa534671c9a44d5a733bb.jpg" alt="Avatar">
         </div>
 
         <div class="hero-body">
-          <!-- EDIT: Name and tagline -->
           <h1 id="hero-title" class="name">Ayush Gawade <span style="font-weight:600;color:var(--muted)"></span></h1>
           <p class="lead">I build whatever you want. I love solving problems, automating workflows, and shipping polished UI.</p>
 
           <div class="actions">
-            <!-- EDIT: Buttons / links -->
             <a class="btn" href="#projects" title="See projects">
               <span class="icon" aria-hidden="true">💼</span>
               Projects
@@ -319,12 +392,8 @@
               Contact
             </a>
 
-            <!-- social icon example -->
-            <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" title="GitHub" rel="noopener">
-              <!-- simple GitHub svg icon -->
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.57.1.78-.25.78-.55 0-.27-.01-1-.02-1.97-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.3 1.18-3.11-.12-.29-.52-1.46.11-3.04 0 0 .96-.31 3.14 1.18.91-.25 1.88-.38 2.84-.38.96 0 1.93.13 2.84.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.58.23 2.75.11 3.04.74.81 1.18 1.85 1.18 3.11 0 4.43-2.71 5.4-5.29 5.69.41.36.78 1.07.78 2.16 0 1.56-.01 2.82-.01 3.2 0 .3.2.65.79.54C20.71 21.39 24 17.08 24 12 24 5.65 18.35.5 12 .5z"/>
-              </svg>
+            <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" title="GitHub" rel="noopener" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.57.1.78-.25.78-.55 0-.27-.01-1-.02-1.97-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.3 1.18-3.11-.12-.29-.52-1.46.11-3.04 0 0 .96-.31 3.14 1.18.91-.25 1.88-.38 2.84-.38.96 0 1.93.13 2.84.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.58.23 2.75.11 3.04.74.81 1.18 1.85 1.18 3.11 0 4.43-2.71 5.4-5.29 5.69.41.36.78 1.07.78 2.16 0 1.56-.01 2.82-.01 3.2 0 .3.2.65.79.54C20.71 21.39 24 17.08 24 12 24 5.65 18.35.5 12 .5z"/></svg>
             </a>
           </div>
         </div>
@@ -336,7 +405,6 @@
       <section id="about" class="reveal" aria-labelledby="about-heading">
         <h2 id="about-heading">About Me</h2>
         <p style="color:var(--muted); margin-top:8px">
-          <!-- EDIT: Short about text -->
           I'm a third-year computer science student who loves building useful tools and clean UIs. I enjoy learning new technologies, open-source, and coffee-fueled late-night coding.
         </p>
       </section>
@@ -345,7 +413,6 @@
       <section id="skills" class="reveal" aria-labelledby="skills-heading">
         <h2 id="skills-heading">Skills</h2>
         <div style="margin-top:10px">
-          <!-- EDIT: Add/remove skills as pills -->
           <span class="pill">Java</span>
           <span class="pill">C++</span>
           <span class="pill">Python</span>
@@ -362,19 +429,106 @@
           <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.01)">
             <br>
             <br><strong>StudyMate</strong>
-            <img src="https://github.com/Mukul306/Studymate-main/blob/main/favicon/b.png?raw=true" alt="Avatar" width="230" height="210">
+            <img src="https://github.com/Mukul306/Studymate-main/blob/main/favicon/b.png?raw=true" alt="Avatar" width="230" height="210" loading="lazy">
             <p class="muted" style="margin-top:8px">A AI-Powered Study Companion that transforms your study sessions with intelligent task management, real-time progress tracking, and AI-powered learning assistance.</p>
             <a class="btn" href="https://github.com/Mukul306/Studymate-main" style="margin-top:12px;display:inline-block">View</a>
           </div>
 
           <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.01)">
-            <img src="https://i.ibb.co/CKb9hzBf/We-Made-A-Self-Driving-Car.png" alt="Avatar" width="370" height="200">
+            <img src="https://i.ibb.co/CKb9hzBf/We-Made-A-Self-Driving-Car.png" alt="Avatar" width="370" height="200" loading="lazy">
             <br>
             <br><strong>Autonomous RC Car</strong>
             <p class="muted" style="margin-top:8px">Ongoing.</p>
             <a class="btn" href="#" style="margin-top:12px;display:inline-block">Press For Dopamine</a>
           </div>
         </div>
+      </section>
+
+      <!-- EXPERIENCE -->
+      <section id="experience" class="reveal" aria-labelledby="experience-heading">
+        <h2 id="experience-heading">Experience</h2>
+        <div class="timeline" style="margin-top:12px">
+          <div class="exp-item" aria-label="Experience 1">
+            <h3>Frontend Developer — Freelance</h3>
+            <div class="muted">Remote • Jan 2024 — Present</div>
+            <ul>
+              <li>Built responsive web apps with React and vanilla JS.</li>
+              <li>Improved performance by optimizing assets and lazy-loading.</li>
+            </ul>
+          </div>
+          <div class="exp-item" aria-label="Experience 2">
+            <h3>Intern — XYZ Labs</h3>
+            <div class="muted">Pune • Jun 2023 — Dec 2023</div>
+            <ul>
+              <li>Implemented core features for an internal dashboard.</li>
+              <li>Added unit tests and CI pipeline improvements.</li>
+            </ul>
+          </div>
+          <div class="exp-item" aria-label="Experience 3">
+            <h3>Research Assistant — College</h3>
+            <div class="muted">On-campus • Sep 2022 — May 2023</div>
+            <ul>
+              <li>Worked on lightweight ML prototypes and data collection.</li>
+              <li>Presented findings at a student tech meet.</li>
+            </ul>
+          </div>
+          <div class="exp-item" aria-label="Experience 4">
+            <h3>Volunteer — Open Source</h3>
+            <div class="muted">Remote • 2021 — Present</div>
+            <ul>
+              <li>Contributed bug fixes and documentation to OSS projects.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES -->
+      <section id="services" class="reveal" aria-labelledby="services-heading">
+        <h2 id="services-heading">Services</h2>
+        <div class="services" style="margin-top:12px">
+          <div class="service" role="article" aria-labelledby="s1">
+            <div class="icon" aria-hidden="true">💻</div>
+            <h4 id="s1">Web Applications</h4>
+            <p class="muted">Modern responsive web apps with clean UX, optimized for performance and accessibility.</p>
+            <div style="margin-top:auto"><button class="btn" aria-label="Request Web Apps">Request</button></div>
+          </div>
+
+          <div class="service" role="article" aria-labelledby="s2">
+            <div class="icon" aria-hidden="true">🤖</div>
+            <h4 id="s2">Automation</h4>
+            <p class="muted">Automate repetitive workflows, scrape & aggregate data, or build bots tailored to your processes.</p>
+            <div style="margin-top:auto"><button class="btn" aria-label="Request Automation">Request</button></div>
+          </div>
+
+          <div class="service" role="article" aria-labelledby="s3">
+            <div class="icon" aria-hidden="true">🎨</div>
+            <h4 id="s3">UI / Product Design</h4>
+            <p class="muted">Polished interfaces, design systems, and prototyping to ship faster and delight users.</p>
+            <div style="margin-top:auto"><button class="btn" aria-label="Request Design">Request</button></div>
+          </div>
+
+          <div class="service" role="article" aria-labelledby="s4">
+            <div class="icon" aria-hidden="true">💬</div>
+            <h4 id="s4">Consulting</h4>
+            <p class="muted">Technical strategy, architecture reviews, and mentoring to help your team scale.</p>
+            <div style="margin-top:auto"><button class="btn" aria-label="Request Consulting">Request</button></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MOVIE LIST -->
+      <section id="movies" class="reveal" aria-labelledby="movies-heading">
+        <h2 id="movies-heading">Movie List (rate /10)</h2>
+
+        <form id="addMovieForm" class="add-movie" aria-label="Add movie form">
+          <input id="movieTitle" type="text" placeholder="Movie title" aria-label="Movie title" required>
+          <input id="moviePoster" type="url" placeholder="Poster URL (optional)" aria-label="Poster URL">
+          <label for="movieRating" class="muted" style="margin-left:4px">Rating</label>
+          <input id="movieRating" type="range" min="0" max="10" step="1" value="7" aria-label="Initial rating">
+          <button class="btn" type="submit" aria-label="Add movie">Add</button>
+        </form>
+
+        <div id="movieList" class="movie-list" style="margin-top:12px" aria-live="polite"></div>
       </section>
 
       <!-- INTERESTS -->
@@ -388,11 +542,10 @@
         <h2 id="contact-heading">Contact</h2>
         <p class="muted" style="margin-top:8px">Want to work together or ask something? Send an email or connect on LinkedIn.</p>
         <div style="margin-top:12px" class="socials">
-          <!-- EDIT: Replace hrefs with your links -->
-          <a class="icon-btn" href="mailto:agawade2005@gmail.com" title="Email">✉️</a>
-          <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" rel="noopener">GH</a>
-          <a class="icon-btn" href="https://www.linkedin.com/in/ayush-gawade-b29574283/" target="_blank" rel="noopener">in</a>
-          <a class="icon-btn" href="https://instagram.com/tho_aahe_na_gawade" target="_blank" rel="noopener">IG</a>
+          <a class="icon-btn" href="mailto:agawade2005@gmail.com" title="Email" aria-label="Email">✉️</a>
+          <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
+          <a class="icon-btn" href="https://www.linkedin.com/in/ayush-gawade-b29574283/" target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+          <a class="icon-btn" href="https://instagram.com/tho_aahe_na_gawade" target="_blank" rel="noopener" aria-label="Instagram">IG</a>
         </div>
       </section>
     </main>
@@ -442,7 +595,6 @@
             const target = document.querySelector(id);
             if(target){
               target.scrollIntoView({behavior:'smooth', block:'start'});
-              // update URL hash without jumping
               history.replaceState(null, '', id);
             }
           }
@@ -450,35 +602,252 @@
       });
     })();
 
-    // ===== subtle parallax on mouse move for hero (desktop only) =====
-    (function heroParallax(){
-      const hero = document.querySelector('.hero-inner');
-      if(!hero) return;
-      if(document.documentElement.classList.contains('is-touch')) return; // disable on touch
-
-      document.addEventListener('mousemove', function(e){
-        const w = window.innerWidth, h = window.innerHeight;
-        const cx = (e.clientX - w/2) / (w/2);
-        const cy = (e.clientY - h/2) / (h/2);
-        const tx = cx * 6; // translate amount
-        const ty = cy * 6;
-        hero.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
+    // ===== hamburger toggle =====
+    (function hamburger(){
+      const btn = document.querySelector('.menu-btn');
+      const nav = document.getElementById('main-nav');
+      if(!btn || !nav) return;
+      btn.addEventListener('click', ()=>{
+        const open = nav.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-
-      // reset when leaving
-      document.addEventListener('mouseleave', ()=> hero.style.transform = '');
-      window.addEventListener('blur', ()=> hero.style.transform = '');
+      // close when clicking a link (mobile)
+      nav.addEventListener('click', (e)=>{
+        if(e.target.tagName === 'A' && window.innerWidth <= 820){
+          nav.classList.remove('open');
+          btn.setAttribute('aria-expanded','false');
+        }
+      });
     })();
 
-    // ===== accessibility: reduce motion if prefers-reduced-motion =====
+    // ===== hero parallax (subtle) and background parallax =====
+    (function parallax(){
+      if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if(document.documentElement.classList.contains('is-touch')) return;
+
+      const hero = document.querySelector('.hero');
+      const heroInner = document.querySelector('.hero-inner');
+      const root = document.documentElement;
+      const strengthBg = Number(getComputedStyle(root).getPropertyValue('--bg-parallax-strength')) || 18;
+      const strengthStar = Number(getComputedStyle(root).getPropertyValue('--star-parallax-strength')) || 36;
+
+      let lastX = 0, lastY = 0, rafId = null;
+
+      function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+      document.addEventListener('mousemove', (e)=>{
+        const w = window.innerWidth, h = window.innerHeight;
+        const cx = (e.clientX - w/2) / (w/2); // -1..1
+        const cy = (e.clientY - h/2) / (h/2);
+        // background smaller movement
+        const bgTx = clamp((-cx * strengthBg).toFixed(2), -strengthBg, strengthBg) + 'px';
+        const bgTy = clamp((-cy * strengthBg / 2).toFixed(2), -strengthBg, strengthBg) + 'px';
+        // star (foreground) larger movement for depth
+        const starX = clamp((-cx * strengthStar).toFixed(2), -strengthStar, strengthStar) + 'px';
+        const starY = clamp((-cy * strengthStar / 2).toFixed(2), -strengthStar, strengthStar) + 'px';
+        lastX = bgTx; lastY = bgTy;
+        // hero inner small translate but clamped
+        const heroTx = clamp((cx * 8).toFixed(1), -10, 10);
+        const heroTy = clamp((cy * 8).toFixed(1), -10, 10);
+        // throttle via rAF
+        if(rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(()=>{
+          root.style.setProperty('--bg-tx', bgTx);
+          root.style.setProperty('--bg-ty', bgTy);
+          root.style.setProperty('--star-x', starX);
+          root.style.setProperty('--star-y', starY);
+          if(heroInner) heroInner.style.transform = `translate3d(${heroTx}px, ${heroTy}px, 0)`;
+        });
+      });
+
+      // reset on leave/blur
+      document.addEventListener('mouseleave', ()=> {
+        root.style.setProperty('--bg-tx','0px');
+        root.style.setProperty('--bg-ty','0px');
+        root.style.setProperty('--star-x','0px');
+        root.style.setProperty('--star-y','0px');
+        if(heroInner) heroInner.style.transform = '';
+      });
+      window.addEventListener('blur', ()=> {
+        root.style.setProperty('--bg-tx','0px');
+        root.style.setProperty('--bg-ty','0px');
+        root.style.setProperty('--star-x','0px');
+        root.style.setProperty('--star-y','0px');
+        if(heroInner) heroInner.style.transform = '';
+      });
+    })();
+
+    // ===== accessibility: reduce motion fallback =====
     if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
       document.querySelectorAll('.reveal').forEach(el => {
         el.style.transition = 'none';
         el.classList.add('show');
       });
-      document.querySelector('.bg').style.animation = 'none';
+      const bg = document.querySelector('.bg'); if(bg) bg.style.animation = 'none';
+      // remove parallax transforms
+      document.documentElement.style.setProperty('--bg-tx','0px');
+      document.documentElement.style.setProperty('--bg-ty','0px');
+      document.documentElement.style.setProperty('--star-x','0px');
+      document.documentElement.style.setProperty('--star-y','0px');
     }
+
+    // ===== Movie List CRUD + localStorage =====
+    (function movieApp(){
+      const STORAGE_KEY = 'ag-movies-v1';
+      const movieListEl = document.getElementById('movieList');
+      const form = document.getElementById('addMovieForm');
+      const titleInput = document.getElementById('movieTitle');
+      const posterInput = document.getElementById('moviePoster');
+      const ratingInput = document.getElementById('movieRating');
+
+      // sample data
+      const defaults = [
+        { id: cryptoRandomId(), title: "Inception", poster: "", rating: 9 },
+        { id: cryptoRandomId(), title: "The Matrix", poster: "", rating: 9 },
+        { id: cryptoRandomId(), title: "Interstellar", poster: "", rating: 8 }
+      ];
+
+      function cryptoRandomId(){ return 'm_'+Math.random().toString(36).slice(2,9) }
+
+      function readStore(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(!raw) return null;
+          return JSON.parse(raw);
+        }catch(e){ console.error('movie parse err', e); return null }
+      }
+      function writeStore(data){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function ensureInit(){
+        let data = readStore();
+        if(!data){
+          writeStore(defaults);
+          data = defaults;
+        }
+        return data;
+      }
+
+      function render(){
+        const items = ensureInit();
+        movieListEl.innerHTML = '';
+        items.forEach(item => {
+          const row = document.createElement('div'); row.className = 'movie-row';
+          row.setAttribute('data-id', item.id);
+
+          const thumb = document.createElement('div'); thumb.className = 'movie-thumb';
+          const img = document.createElement('img');
+          img.alt = item.title + ' poster';
+          img.loading = 'lazy';
+          img.src = item.poster || 'https://via.placeholder.com/120x180?text=Poster';
+          thumb.appendChild(img);
+
+          const meta = document.createElement('div'); meta.className = 'movie-meta';
+          const title = document.createElement('p'); title.className = 'movie-title'; title.textContent = item.title;
+          meta.appendChild(title);
+
+          const ratingRow = document.createElement('div'); ratingRow.className = 'rating-control';
+          // range input
+          const range = document.createElement('input');
+          range.type = 'range'; range.min = 0; range.max = 10; range.step = 1;
+          range.value = item.rating; range.setAttribute('aria-label', `Rating for ${item.title}`);
+          range.addEventListener('input', (e)=> {
+            updateRating(item.id, Number(e.target.value));
+          });
+
+          // rating bar visual
+          const barWrap = document.createElement('div'); barWrap.className = 'rating-bar';
+          const fill = document.createElement('div'); fill.className = 'rating-fill';
+          fill.style.width = (Number(item.rating) * 10) + '%';
+          barWrap.appendChild(fill);
+
+          const val = document.createElement('div'); val.className = 'rating-value'; val.textContent = item.rating + '/10';
+
+          ratingRow.appendChild(range);
+          ratingRow.appendChild(barWrap);
+          ratingRow.appendChild(val);
+
+          meta.appendChild(ratingRow);
+
+          // actions
+          const actions = document.createElement('div');
+          actions.style.display = 'flex'; actions.style.flexDirection = 'column'; actions.style.gap = '8px';
+          const delBtn = document.createElement('button'); delBtn.className = 'btn'; delBtn.type='button'; delBtn.textContent = 'Delete'; delBtn.setAttribute('aria-label', `Delete ${item.title}`);
+          delBtn.addEventListener('click', ()=> removeMovie(item.id));
+          actions.appendChild(delBtn);
+
+          row.appendChild(thumb);
+          row.appendChild(meta);
+          row.appendChild(actions);
+
+          movieListEl.appendChild(row);
+        });
+      }
+
+      function addMovie(obj){
+        const list = readStore() || [];
+        const entry = {
+          id: cryptoRandomId(),
+          title: obj.title,
+          poster: obj.poster || '',
+          rating: Number(obj.rating || 0)
+        };
+        list.unshift(entry);
+        writeStore(list);
+        render();
+      }
+
+      function updateRating(id, rating){
+        const list = readStore() || [];
+        const i = list.findIndex(x=>x.id===id);
+        if(i>=0){ list[i].rating = rating; writeStore(list); render(); }
+      }
+
+      function removeMovie(id){
+        let list = readStore() || [];
+        list = list.filter(x=>x.id !== id);
+        writeStore(list);
+        render();
+      }
+
+      // init
+      render();
+
+      // handle add form
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const title = titleInput.value.trim();
+        if(!title) { titleInput.focus(); return; }
+        addMovie({ title, poster: posterInput.value.trim(), rating: ratingInput.value });
+        form.reset();
+        ratingInput.value = 7;
+        titleInput.focus();
+      });
+    })();
+
+    // ===== hero subtle parallax reset when touch detected or small screens change =====
+    (function watchResize(){
+      window.addEventListener('resize', ()=>{
+        if(window.innerWidth <= 820){
+          document.getElementById('main-nav').classList.remove('open');
+          document.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');
+        }
+      });
+    })();
+
+    // ===== keyboard accessibility: allow number keys to focus rating after tabbing to range (enhancement) =====
+    (function keyHints(){
+      document.addEventListener('keydown', (e)=>{
+        // if focus is on a range, allow +/- to change
+        const el = document.activeElement;
+        if(el && el.type === 'range'){
+          if(e.key === '+' || e.key === '=' ) { el.stepUp(); el.dispatchEvent(new Event('input')); e.preventDefault(); }
+          if(e.key === '-' || e.key === '_') { el.stepDown(); el.dispatchEvent(new Event('input')); e.preventDefault(); }
+        }
+      });
+    })();
+
   </script>
 </body>
 </html>
-
