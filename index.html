@@ -5,32 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ayush Gawade — Portfolio</title>
 
-  <!-- Google font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#070607;            /* main background (dark) */
-      --panel:#0e0e0f;         /* content panel */
-      --accent:#c0485a;        /* soft pink */
-      --muted:#bfbfbf;         /* muted text */
-      --glass: rgba(255,255,255,0.03);
-      --radius: 14px;
-      --transition: 350ms cubic-bezier(.2,.9,.2,1);
       --max-width:1100px;
-
-      /* background tuning */
-      --star-1-opacity: 0.18;
-      --star-2-opacity: 0.10;
-      --bg-drift-duration: 60s;
-      --conic-rotate-duration: 24s;
-      --star-layer-duration: 78s;
-      --bg-parallax-strength: 18;   /* px max translate for background (desktop) */
-      --star-parallax-strength: 36; /* foreground stars move more */
-      --bg-tx: 0px;
-      --bg-ty: 0px;
-      --star-x: 0px;
-      --star-y: 0px;
+      --radius:14px;
+      --accent-1: #7aa7ff;
+      --accent-2: #6be6c1;
+      --muted: #bfbfbf;
+      --panel: rgba(255,255,255,0.03);
+      --text: #ffffff;
+      --bg-base: #061021; /* deep navy */
+      --blob-1: rgba(122,167,255,0.16);
+      --blob-2: rgba(107,230,193,0.12);
+      --particles-color: rgba(255,255,255,0.08);
+      --transition: 350ms cubic-bezier(.2,.9,.2,1);
+      --nav-height: 72px;
     }
 
     *{box-sizing:border-box}
@@ -38,319 +29,251 @@
     body{
       margin:0;
       font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--bg);
-      color:#fff;
+      background: var(--bg-base);
+      color:var(--text);
       -webkit-font-smoothing:antialiased;
       -moz-osx-font-smoothing:grayscale;
       overflow-x:hidden;
       line-height:1.45;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-font-smoothing:antialiased;
     }
 
-    /* -------------------------
-       Moving background (stardust-like)
-       ------------------------- */
     .bg {
       position: fixed;
       inset: 0;
-      z-index: -3;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255,210,220,var(--star-1-opacity)) 0.9px, transparent 1px),
-        radial-gradient(circle at 60% 70%, rgba(255,200,210,0.08) 1.1px, transparent 1px),
-        linear-gradient(180deg, rgba(240,220,230,0.08), rgba(0,0,0,0.18));
-      background-size: 24px 24px, 48px 48px, cover;
-      opacity: 1;
-      transform-origin:center;
-      will-change: transform, background-position;
-      animation: bg-drift var(--bg-drift-duration) linear infinite;
-      transform: translate3d(var(--bg-tx), var(--bg-ty), 0);
-    }
-    @keyframes bg-drift {
-      from { background-position: 0 0, 0 0, 0 0; }
-      to   { background-position: -520px -360px, 400px 300px, 0 0; }
+      z-index: -4;
+      pointer-events: none;
+      background: radial-gradient(circle at 10% 20%, rgba(147, 95, 225, 0.02), transparent 60%),
+                  linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.6));
+      overflow:hidden;
     }
 
-    .bg::before{
-      content:"";
-      position:absolute; inset:0; z-index:-2; pointer-events:none;
-      background: conic-gradient(from 200deg, rgba(192,72,90,0.08), rgba(255,200,200,0.05), rgba(160,160,200,0.05));
-      mix-blend-mode: overlay;
-      opacity: 1;
-      filter: blur(40px) saturate(1.05);
-      animation: conic-rotate var(--conic-rotate-duration) linear infinite;
-      will-change: transform;
-      transform: translate3d(calc(var(--bg-tx) / 1.8), calc(var(--bg-ty) / 1.8), 0);
-    }
-    @keyframes conic-rotate { to { transform: rotate(360deg) } }
 
+    .bg::before,
     .bg::after{
-      content:"";
-      position:absolute; inset:0; z-index:-4; pointer-events:none;
-      background:
-        radial-gradient(circle at 8% 15%, rgba(255,255,255,var(--star-2-opacity)) 0.7px, transparent 1px),
-        radial-gradient(circle at 40% 80%, rgba(255,255,255,0.06) 0.9px, transparent 1px);
-      background-size: 20px 20px, 44px 44px;
-      transform: translate3d(var(--star-x), var(--star-y), 0);
-      animation: starLayer var(--star-layer-duration) linear infinite;
-      will-change: transform, background-position;
-    }
-    @keyframes starLayer {
-      from { background-position: 0 0, 0 0; }
-      to   { background-position: -900px -700px, 700px 500px; }
+      content: "";
+      position:absolute;
+      top: -10%;
+      left: -10%;
+      width: 140%;
+      height: 140%;
+      filter: blur(64px) contrast(1.05);
+      transform-origin: center;
+      will-change: transform;
+      mix-blend-mode: screen;
+      opacity: 1;
+      pointer-events:none;
+      animation-timing-function: linear;
     }
 
-    /* preferences */
+  
+    .bg::before{
+      background: radial-gradient(closest-side, var(--blob-1), transparent 40%);
+      animation-name: blob-move-1, blob-rotate;
+      animation-duration: 26s, 36s;
+      animation-iteration-count: infinite, infinite;
+      animation-direction: normal, normal;
+      animation-fill-mode: both;
+    }
+
+  
+    .bg::after{
+      background: radial-gradient(closest-side, var(--blob-2), transparent 35%);
+      animation-name: blob-move-2, blob-rotate-rev;
+      animation-duration: 32s, 52s;
+      animation-iteration-count: infinite, infinite;
+      animation-fill-mode: both;
+    }
+
+    @keyframes blob-move-1 {
+      0%   { transform: translate3d(-8vw, -6vh) scale(1); }
+      25%  { transform: translate3d(10vw, -4vh) scale(1.05); }
+      50%  { transform: translate3d(6vw, 8vh) scale(0.98); }
+      75%  { transform: translate3d(-6vw, 10vh) scale(1.02); }
+      100% { transform: translate3d(-8vw, -6vh) scale(1); }
+    }
+    @keyframes blob-move-2 {
+      0%   { transform: translate3d(12vw, 8vh) scale(0.9); }
+      25%  { transform: translate3d(-6vw, 6vh) scale(1.06); }
+      50%  { transform: translate3d(-10vw, -6vh) scale(1.02); }
+      75%  { transform: translate3d(8vw, -8vh) scale(0.98); }
+      100% { transform: translate3d(12vw, 8vh) scale(0.9); }
+    }
+    @keyframes blob-rotate {
+      from{ transform: rotate(0deg); } to{ transform: rotate(360deg); }
+    }
+    @keyframes blob-rotate-rev {
+      from{ transform: rotate(0deg); } to{ transform: rotate(-360deg); }
+    }
+
+
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,0.06) 0.6px, transparent 1px),
+        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.035) 0.7px, transparent 1px),
+        radial-gradient(circle at 40% 40%, rgba(255,255,255,0.03) 0.5px, transparent 1px);
+      background-size: 28px 28px, 48px 48px, 36px 36px;
+      opacity: 0.95;
+      will-change: background-position;
+      animation: particles-drift 80s linear infinite;
+      pointer-events:none;
+      mix-blend-mode: overlay;
+      filter: saturate(1.05) blur(0.2px);
+    }
+    @keyframes particles-drift {
+      from { background-position: 0 0, 0 0, 0 0; }
+      to   { background-position: -900px -600px, 700px 500px, -400px 300px; }
+    }
+
+    
     @media (prefers-reduced-motion: reduce) {
-      .bg, .bg::before, .bg::after { animation: none !important; transform: none !important; }
+      .bg::before, .bg::after, .particles { animation: none !important; transform: none !important; }
     }
 
-    /* page container */
+    
     .wrap{
       max-width:var(--max-width);
       margin:0 auto;
       padding:28px 20px;
+      position:relative;
+      z-index:10;
     }
 
-    /* header / top bar */
     header{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:8px 0 24px;
+      padding:8px 0 18px;
       position:sticky;
       top:0;
-      z-index:50;
-      backdrop-filter: blur(6px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+      z-index:20;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.08));
     }
-    .brand{
-      display:flex;gap:12px;align-items:center;
-    }
+    .brand{ display:flex; gap:12px; align-items:center; }
     .logo{
       display:inline-grid;
       place-items:center;
-      width:44px;height:44px;border-radius:12px;
-      background: linear-gradient(135deg, rgba(255,182,193,0.12), rgba(255,182,193,0.05));
-      box-shadow: 0 6px 18px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
-      font-weight:800;color:var(--accent);
-      font-size:16px;
+      width:48px;height:48px;border-radius:12px;
+      background: linear-gradient(135deg,var(--accent-1),var(--accent-2));
+      color:#061021; font-weight:800; font-size:16px;
+      box-shadow: 0 8px 30px rgba(8,12,20,0.6);
     }
-    .nav{
-      display:flex;gap:10px;align-items:center;
-    }
+    .brand .meta { line-height:1; }
+    .brand .meta .name { font-weight:800; }
+    .nav{ display:flex; gap:10px; align-items:center; }
     .nav a{
-      color:var(--muted); text-decoration:none; font-weight:600; font-size:14px;
-      padding:8px 12px; border-radius:999px; transition:var(--transition);
+      color:var(--muted);
+      text-decoration:none;
+      font-weight:600;
+      font-size:14px;
+      padding:8px 12px;
+      border-radius:999px;
+      transition: var(--transition);
     }
-    .nav a:hover{ color:#fff; background: rgba(255,182,193,0.06); box-shadow:0 6px 20px rgba(255,182,193,0.03) }
+    .nav a:hover{ color:#fff; background: rgba(255,255,255,0.04); box-shadow: 0 6px 20px rgba(0,0,0,0.4) }
 
-    /* hamburger (mobile) */
-    .menu-btn{
-      display:none;
-      background:transparent;border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px;
-      width:44px;height:44px; align-items:center; justify-content:center; cursor:pointer;
-    }
-    .menu-btn:focus{ outline:3px solid rgba(192,72,90,0.12); outline-offset:3px }
+    .menu-btn{ display:none; background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; width:44px;height:44px; cursor:pointer; }
 
-    /* Hero */
-    .hero{
-      min-height:68vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px 0;
-    }
+    
+    .hero{ min-height:68vh; display:flex; align-items:center; justify-content:center; padding:40px 0; }
     .hero-inner{
       display:flex;
       gap:28px;
       align-items:center;
       width:100%;
-      padding:28px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+      padding:32px;
       border-radius:var(--radius);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      transition:transform 450ms ease, box-shadow 450ms ease;
-      will-change: transform;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow: 0 12px 50px rgba(2,6,23,0.6);
+      transition: transform 420ms var(--transition);
       transform: translate3d(0,0,0);
     }
-    /* On small screens stack vertically */
-    @media (max-width:820px){
-      .menu-btn{ display:inline-flex }
-      .nav{ display:none; position:absolute; right:20px; top:72px; flex-direction:column; background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25)); padding:10px; border-radius:12px; }
-      .nav.open{ display:flex; }
-      .hero-inner{flex-direction:column; text-align:center; padding:20px;}
-    }
+    .avatar{ width:150px;height:150px;border-radius:18px; overflow:hidden; flex:0 0 150px; box-shadow: 0 14px 40px rgba(2,6,23,0.6); border: 1px solid rgba(255,255,255,0.03); }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-    .avatar {
-      width:150px;height:150px;border-radius:20px;overflow:hidden;
-      flex:0 0 150px; box-shadow: 0 12px 40px rgba(255,182,193,0.08);
-      border: 1px solid rgba(255,255,255,0.03);
-      background: linear-gradient(180deg, rgba(255,182,193,0.02), rgba(255,182,193,0.01));
-      transform: translateY(0);
-      transition: transform 450ms var(--transition), box-shadow 450ms var(--transition);
-    }
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .hero-body{ flex:1; padding-right:6px; }
+    .name{ margin:0; font-size: clamp(20px, 3.6vw, 36px); font-weight:800; letter-spacing:-0.02em; color:var(--text); }
+    .lead{ margin:12px 0 18px; color:var(--muted); font-size:15px; max-width:70ch; }
 
-    /* Info column */
-    .hero-body{flex:1; padding-right:8px}
-    h1.name{
-      margin:0; font-size: clamp(20px, 3.2vw, 34px); font-weight:800; letter-spacing:-0.02em;
-      color: #fff;
-    }
-    p.lead{
-      margin:10px 0 18px; color:var(--muted); font-size:15px;
-    }
-
-    /* buttons (social + CTA) */
-    .actions{display:flex;gap:12px;flex-wrap:wrap}
+    .actions{ display:flex; gap:12px; flex-wrap:wrap; }
     .btn{
-      display:inline-flex;align-items:center;gap:10px;
-      border:none; cursor:pointer; outline:none;
-      background:#fff; color:#000; padding:10px 16px; border-radius:999px;
-      font-weight:700; font-size:14px; text-decoration:none;
-      box-shadow: 0 8px 28px rgba(255,182,193,0.06);
-      transition: transform 220ms var(--transition), box-shadow 280ms var(--transition), background 220ms var(--transition), color 220ms var(--transition);
-      user-select:none;
-      min-height:40px;
-    }
-    .btn .icon{width:18px;height:18px;display:inline-grid;place-items:center;opacity:0.95}
-    .btn:hover{
-      transform: translateY(-4px) scale(1.01);
-      background: var(--accent);
-      color: white;
-      box-shadow: 0 20px 40px rgba(255,182,193,0.18), 0 1px 0 rgba(255,255,255,0.02) inset;
-    }
+  display:inline-flex; align-items:center; gap:10px; border:none; cursor:pointer;
+  background:linear-gradient(90deg,var(--accent-1),var(--accent-2));
+  color:#061021; padding:10px 16px; border-radius:999px; font-weight:700; font-size:14px;
+  box-shadow: 0 12px 30px rgba(122,167,255,0.12);
+  transition: transform 200ms var(--transition), box-shadow 200ms var(--transition), opacity 200ms;
+  text-decoration: none;
+}
 
-    /* ensure tappable sizes on mobile */
-    @media (max-width:820px){
-      .btn{ min-height:44px; padding:12px 16px; font-size:15px }
-      .icon-btn{ width:48px; height:48px; }
-    }
+    .btn:hover{ transform: translateY(-4px); box-shadow: 0 26px 60px rgba(122,167,255,0.18); opacity:0.98; }
+    .icon-btn{ width:44px; height:44px; display:inline-grid; place-items:center; border-radius:10px; background:rgba(255,255,255,0.02); color:var(--muted); border:1px solid rgba(255,255,255,0.02); }
 
-    /* subtle hover glow for desktop (but not on touch) */
-    .no-touch .btn:hover{
-      filter: drop-shadow(0 8px 30px rgba(255,182,193,0.25));
-    }
+   
+    main{ margin-top:36px; }
+    section{ background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent); border-radius:12px; padding:20px; margin:18px 0; box-shadow: 0 8px 26px rgba(0,0,0,0.6); }
+    section h2{ margin:0 0 8px 0; color:var(--accent-1); font-size:18px; font-weight:700; }
 
-    /* Sections */
-    main{
-      margin-top:36px;
-    }
-    section{
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-      border-radius:12px;
-      padding:20px;
-      margin:18px 0;
-      box-shadow: 0 8px 26px rgba(0,0,0,0.6);
-      overflow:hidden;
-    }
-    section h2{
-      margin:0 0 8px 0; color:var(--accent); font-size:18px; font-weight:700;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:16px;
-    }
-    @media (max-width:760px){
-      .grid{ grid-template-columns:1fr; }
-      .avatar{ width:120px;height:120px; border-radius:14px }
-    }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr } }
 
-    /* Experience timeline */
-    .timeline{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap:18px;
-    }
+    
+    .timeline{ display:grid; grid-template-columns: repeat(2,1fr); gap:18px; }
     .exp-item{ background: rgba(255,255,255,0.01); padding:14px; border-radius:10px; }
-    .exp-item h3{ margin:0; font-size:16px }
-    .exp-item .muted{ font-size:13px }
-    .exp-item ul{ margin:8px 0 0 18px; padding:0; color:var(--muted); font-size:14px }
     @media (max-width:900px){ .timeline{ grid-template-columns:1fr } }
 
-    /* services */
-    .services{ display:grid; grid-template-columns: repeat(3, 1fr); gap:16px }
-    .service{ padding:18px; border-radius:12px; background: rgba(255,255,255,0.01); display:flex; flex-direction:column; gap:8px; align-items:flex-start; transition: transform 220ms var(--transition), box-shadow 220ms var(--transition) }
-    .service:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.6) }
-    .service .icon{ width:44px;height:44px;border-radius:10px; display:inline-grid;place-items:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border:1px solid rgba(255,255,255,0.02)}
-    .service h4{ margin:0 }
+    .services{ display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
     @media (max-width:1000px){ .services{ grid-template-columns: repeat(2,1fr) } }
     @media (max-width:700px){ .services{ grid-template-columns:1fr } }
 
-    /* movie list */
-    .movie-list{ display:flex; flex-direction:column; gap:12px }
-    .movie-row{ display:flex; gap:12px; align-items:center; background: rgba(255,255,255,0.01); padding:10px; border-radius:10px }
-    .movie-thumb{ width:72px; height:100px; flex:0 0 72px; border-radius:8px; overflow:hidden; background:#111; display:grid; place-items:center }
-    .movie-thumb img{ width:100%; height:100%; object-fit:cover; display:block }
-    .movie-meta{ flex:1; min-width:0 }
-    .movie-title{ font-weight:700; margin:0; font-size:15px }
-    .rating-control{ display:flex; gap:12px; align-items:center; margin-top:6px }
-    .rating-bar{ height:8px; width:120px; background: rgba(255,255,255,0.06); border-radius:999px; overflow:hidden }
-    .rating-fill{ height:100%; width:0%; background: linear-gradient(90deg,var(--accent), #ff9aa2); }
-    .rating-value{ min-width:44px; text-align:right; font-weight:700 }
-
-    form.add-movie{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
-    form.add-movie input[type="text"], form.add-movie input[type="url"]{ background:transparent; border:1px solid rgba(255,255,255,0.04); padding:8px 10px; border-radius:8px; color:var(--muted); min-width:160px }
-    form.add-movie input[type="range"]{ width:120px }
-    form.add-movie button{ margin-left:6px }
-
-    /* Fade-in on scroll (initial state) */
-    .reveal{
-      opacity:0;
-      transform: translateY(28px) scale(0.995);
-      transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 600ms ease;
-      will-change: transform, opacity;
+    
+    .movies-list{ display:flex; flex-direction:column; gap:10px; margin-top:12px; }
+    .movie-item{
+      display:flex; align-items:center; gap:12px; padding:10px; border-radius:10px; background: rgba(255,255,255,0.01);
+      justify-content:space-between;
     }
-    .reveal.show{
-      opacity:1;
-      transform: translateY(0) scale(1);
+    .movie-left{ display:flex; gap:12px; align-items:center; min-width:0; }
+    .movie-thumb{ width:64px; height:88px; border-radius:8px; overflow:hidden; background:#071428; display:grid; place-items:center; flex:0 0 64px; }
+    .movie-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .movie-meta{ min-width:0; }
+    .movie-title{ font-weight:700; margin:0; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .movie-sub{ color:var(--muted); font-size:13px; margin-top:4px; }
+
+    .movie-rating{ display:flex; align-items:center; gap:8px; color:var(--muted); font-weight:700; min-width:72px; justify-content:flex-end; }
+
+    
+    footer{ margin:36px 0 80px; text-align:center; color:var(--muted); font-size:13px; }
+
+    
+    @media (max-width:820px){
+      .menu-btn{ display:inline-flex; }
+      .nav{ display:none; position:absolute; right:16px; top:68px; flex-direction:column; background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25)); padding:10px; border-radius:12px; }
+      .nav.open{ display:flex; }
+      .hero-inner{ flex-direction:column; text-align:center; padding:20px; }
+      .avatar{ width:120px; height:120px; border-radius:14px; }
     }
 
-    /* footer */
-    footer{
-      margin:36px 0 80px; text-align:center; color:var(--muted); font-size:13px;
-    }
-
-    /* small helpers */
-    .muted{ color:var(--muted); font-weight:600 }
-    .socials{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
-    .icon-btn{
-      width:44px;height:44px;border-radius:10px;
-      display:inline-grid;place-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
-      border:1px solid rgba(255,255,255,0.02); text-decoration:none; color:var(--muted);
-      transition:var(--transition);
-    }
-    .icon-btn:hover{ color: #fff; transform: translateY(-4px); background:var(--accent); box-shadow:0 12px 30px rgba(255,182,193,0.12) }
-
-    /* accessibility focus */
-    a:focus, button:focus, input:focus { outline: 3px solid rgba(255,182,193,0.12); outline-offset:3px; border-radius:8px }
-
-    /* low-powered / small screens: reduce background noise */
-    @media (max-width:520px){
-      :root{
-        --bg-parallax-strength: 6;
-        --star-parallax-strength: 10;
-      }
-      .bg{ background-size: 30px 30px, 60px 60px, cover; }
-      .bg::after{ background-size: 36px 36px, 72px 72px; }
-    }
+    
+    a:focus, button:focus { outline: 3px solid rgba(122,167,255,0.12); outline-offset:3px; border-radius:8px; }
 
   </style>
 </head>
 <body>
-  <div class="bg" aria-hidden="true"></div>
+ 
+  <div class="bg" aria-hidden="true">
+    <div class="particles" aria-hidden="true"></div>
+  </div>
 
   <div class="wrap">
-    <!-- Header -->
+   
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true">AG</div>
-        <div>
-          <div style="font-weight:800">Ayush Gawade</div>
+        <div class="meta">
+          <div class="name">Ayush Gawade</div>
           <div style="font-size:12px;color:var(--muted);margin-top:2px">Web • Software • Creator</div>
         </div>
       </div>
@@ -370,7 +293,7 @@
       </nav>
     </header>
 
-    <!-- HERO -->
+   
     <section class="hero" role="banner" aria-labelledby="hero-title">
       <div class="hero-inner reveal" style="--r:1">
         <div class="avatar" aria-hidden="false">
@@ -378,29 +301,19 @@
         </div>
 
         <div class="hero-body">
-          <h1 id="hero-title" class="name">Ayush Gawade <span style="font-weight:600;color:var(--muted)"></span></h1>
+          <h1 id="hero-title" class="name">Ayush Gawade</h1>
           <p class="lead">I build whatever you want. I love solving problems, automating workflows, and shipping polished UI.</p>
 
           <div class="actions">
-            <a class="btn" href="#projects" title="See projects">
-              <span class="icon" aria-hidden="true">💼</span>
-              Projects
-            </a>
-
-            <a class="btn" href="#contact" title="Contact me">
-              <span class="icon" aria-hidden="true">🤙🏻</span>
-              Contact
-            </a>
-
-            <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" title="GitHub" rel="noopener" aria-label="GitHub">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.9.57.1.78-.25.78-.55 0-.27-.01-1-.02-1.97-3.2.7-3.88-1.54-3.88-1.54-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.71.08-.71 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.72-1.55-2.56-.29-5.26-1.28-5.26-5.7 0-1.26.45-2.3 1.18-3.11-.12-.29-.52-1.46.11-3.04 0 0 .96-.31 3.14 1.18.91-.25 1.88-.38 2.84-.38.96 0 1.93.13 2.84.38 2.18-1.49 3.14-1.18 3.14-1.18.63 1.58.23 2.75.11 3.04.74.81 1.18 1.85 1.18 3.11 0 4.43-2.71 5.4-5.29 5.69.41.36.78 1.07.78 2.16 0 1.56-.01 2.82-.01 3.2 0 .3.2.65.79.54C20.71 21.39 24 17.08 24 12 24 5.65 18.35.5 12 .5z"/></svg>
-            </a>
+            <a class="btn" href="#projects" title="See projects">💼 Projects</a>
+            <a class="btn" href="#contact" title="Contact me">🤙 Contact</a>
+            <a class="icon-btn" href="https://github.com/Ayush-Gawade" target="_blank" rel="noopener" aria-label="GitHub">GH</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ABOUT -->
+    
     <main>
       <section id="about" class="reveal" aria-labelledby="about-heading">
         <h2 id="about-heading">About Me</h2>
@@ -409,135 +322,161 @@
         </p>
       </section>
 
-      <!-- SKILLS -->
+     
       <section id="skills" class="reveal" aria-labelledby="skills-heading">
         <h2 id="skills-heading">Skills</h2>
         <div style="margin-top:10px">
-          <span class="pill">Java</span>
-          <span class="pill">C++</span>
-          <span class="pill">Python</span>
-          <span class="pill">React</span>
-          <span class="pill">Node.js</span>
-          <span class="pill">SQL</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">Java</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">C++</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">Python</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">React</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">Node.js</span>
+          <span style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,0.03);color:var(--muted);margin:6px;font-weight:600;font-size:13px">SQL</span>
         </div>
       </section>
 
-      <!-- PROJECTS -->
+  
       <section id="projects" class="reveal" aria-labelledby="projects-heading">
         <h2 id="projects-heading">Projects</h2>
         <div class="grid" style="margin-top:12px">
-          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.01)">
-            <br>
-            <br><strong>StudyMate</strong>
-            <img src="https://github.com/Mukul306/Studymate-main/blob/main/favicon/b.png?raw=true" alt="Avatar" width="230" height="210" loading="lazy">
-            <p class="muted" style="margin-top:8px">A AI-Powered Study Companion that transforms your study sessions with intelligent task management, real-time progress tracking, and AI-powered learning assistance.</p>
+          <div style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.01)">
+            <strong>StudyMate</strong>
+            <div style="margin-top:8px">
+              <img src="https://github.com/Mukul306/Studymate-main/blob/main/favicon/b.png?raw=true" alt="StudyMate" width="220" height="200" loading="lazy" style="max-width:100%;border-radius:8px">
+            </div>
+            <p class="muted" style="margin-top:8px">An AI-powered study companion that helps structure sessions and track progress.</p>
             <a class="btn" href="https://github.com/Mukul306/Studymate-main" style="margin-top:12px;display:inline-block">View</a>
           </div>
 
-          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.01)">
-            <img src="https://i.ibb.co/CKb9hzBf/We-Made-A-Self-Driving-Car.png" alt="Avatar" width="370" height="200" loading="lazy">
-            <br>
-            <br><strong>Autonomous RC Car</strong>
-            <p class="muted" style="margin-top:8px">Ongoing.</p>
-            <a class="btn" href="#" style="margin-top:12px;display:inline-block">Press For Dopamine</a>
+          <div style="padding:14px;border-radius:10px;background:rgba(255,255,255,0.01)">
+            <strong>Autonomous RC Car</strong>
+            <div style="margin-top:8px">
+              <img src="https://i.ibb.co/CKb9hzBf/We-Made-A-Self-Driving-Car.png" alt="RC Car" width="80%" height="200" loading="lazy" style="border-radius:8px; object-fit:cover">
+            </div>
+            <p class="muted" style="margin-top:8px">Ongoing research and prototyping for small-scale autonomous driving.</p>
+            <a class="btn" href="#" style="margin-top:12px;display:inline-block">Click for staying in a loop</a>
           </div>
         </div>
       </section>
 
-      <!-- EXPERIENCE -->
+   
       <section id="experience" class="reveal" aria-labelledby="experience-heading">
         <h2 id="experience-heading">Experience</h2>
         <div class="timeline" style="margin-top:12px">
-          <div class="exp-item" aria-label="Experience 1">
+          <div class="exp-item">
             <h3>Frontend Developer — Freelance</h3>
-            <div class="muted">Remote • Jan 2024 — Present</div>
+            <div class="muted">Remote • Dec 2025 — Present</div>
             <ul>
-              <li>Built responsive web apps with React and vanilla JS.</li>
-              <li>Improved performance by optimizing assets and lazy-loading.</li>
+              <li>Builing responsive web apps with React.</li>
+              <li>Optimized performance and accessibility across projects.</li>
             </ul>
           </div>
-          <div class="exp-item" aria-label="Experience 2">
-            <h3>Intern — XYZ Labs</h3>
-            <div class="muted">Pune • Jun 2023 — Dec 2023</div>
+          <div class="exp-item">
+            <h3>Software Intern — TM Automotive Seating Systems Pvt. Ltd.</h3>
+            <div class="muted">Jul 2025 — Sep 2025 </div>
+            <div class="muted">📍Pune </div>
             <ul>
-              <li>Implemented core features for an internal dashboard.</li>
-              <li>Added unit tests and CI pipeline improvements.</li>
+              <li>Developing a low-end inventory management app using C# and SQLite to interface between hardware modules and software systems</li>
+              <li>Contributing to early planning of a VR application to enhance product interaction in the seat manufacturing industry.</li>
+              <li>Applied concepts from Computer Networks and Security coursework to real-world systems: DHCP, IP configurations, and network communication.</li>
+              <li>Collaborating with hardware and production teams to align the software with seat manufacturing workflows.</li>
+            
             </ul>
           </div>
-          <div class="exp-item" aria-label="Experience 3">
-            <h3>Research Assistant — College</h3>
-            <div class="muted">On-campus • Sep 2022 — May 2023</div>
+          <div class="exp-item">
+            <h3>Margadarshak — Jnana Prabodhini Prashala</h3>
+            <div class="muted">Sep 2023 — Present</div>
             <ul>
-              <li>Worked on lightweight ML prototypes and data collection.</li>
-              <li>Presented findings at a student tech meet.</li>
+              <li>Management</li>
             </ul>
           </div>
-          <div class="exp-item" aria-label="Experience 4">
-            <h3>Volunteer — Open Source</h3>
-            <div class="muted">Remote • 2021 — Present</div>
+          <div class="exp-item">
+            <h3>Open Source Contributor</h3>
+            <div class="muted">2021 — Present</div>
             <ul>
-              <li>Contributed bug fixes and documentation to OSS projects.</li>
+              <li>Bug fixes, docs, and small feature contributions to OSS.</li>
             </ul>
           </div>
         </div>
       </section>
 
-      <!-- SERVICES -->
+ 
       <section id="services" class="reveal" aria-labelledby="services-heading">
         <h2 id="services-heading">Services</h2>
         <div class="services" style="margin-top:12px">
           <div class="service" role="article" aria-labelledby="s1">
-            <div class="icon" aria-hidden="true">💻</div>
-            <h4 id="s1">Web Applications</h4>
-            <p class="muted">Modern responsive web apps with clean UX, optimized for performance and accessibility.</p>
-            <div style="margin-top:auto"><button class="btn" aria-label="Request Web Apps">Request</button></div>
+            <div class="icon" aria-hidden="true" style="font-size:20px">💻</div>
+            <h4 id="s1">Whatsapp Chatbot</h4>
+            <p class="muted">Responsive, performance-minded build, and accessible UI.</p>
+            <a class="btn" href="mailto:agawade2005@gmail.com" style="margin-top:12px;display:inline-block">Request</a>
+            
           </div>
 
           <div class="service" role="article" aria-labelledby="s2">
-            <div class="icon" aria-hidden="true">🤖</div>
+            <div class="icon" aria-hidden="true" style="font-size:20px">🤖</div>
             <h4 id="s2">Automation</h4>
-            <p class="muted">Automate repetitive workflows, scrape & aggregate data, or build bots tailored to your processes.</p>
-            <div style="margin-top:auto"><button class="btn" aria-label="Request Automation">Request</button></div>
+            <p class="muted">Scripting, automation, and small bots to remove repetitive work.</p>
+            <a class="btn" href="mailto:agawade2005@gmail.com" style="margin-top:12px;display:inline-block">Request</a>
           </div>
 
           <div class="service" role="article" aria-labelledby="s3">
-            <div class="icon" aria-hidden="true">🎨</div>
+            <div class="icon" aria-hidden="true" style="font-size:20px">🎨</div>
             <h4 id="s3">UI / Product Design</h4>
-            <p class="muted">Polished interfaces, design systems, and prototyping to ship faster and delight users.</p>
-            <div style="margin-top:auto"><button class="btn" aria-label="Request Design">Request</button></div>
+            <p class="muted">Design systems, prototypes, and polished interfaces.</p>
+            <a class="btn" href="mailto:agawade2005@gmail.com" style="margin-top:12px;display:inline-block">Request</a>
           </div>
 
           <div class="service" role="article" aria-labelledby="s4">
-            <div class="icon" aria-hidden="true">💬</div>
+            <div class="icon" aria-hidden="true" style="font-size:20px">💬</div>
             <h4 id="s4">Consulting</h4>
-            <p class="muted">Technical strategy, architecture reviews, and mentoring to help your team scale.</p>
-            <div style="margin-top:auto"><button class="btn" aria-label="Request Consulting">Request</button></div>
+            <p class="muted">Technical strategy, architecture advice, and mentoring.</p>
+            <a class="btn" href="mailto:agawade2005@gmail.com" style="margin-top:12px;display:inline-block">Request</a>
           </div>
         </div>
       </section>
 
-      <!-- MOVIE LIST -->
+  
       <section id="movies" class="reveal" aria-labelledby="movies-heading">
-        <h2 id="movies-heading">Movie List (rate /10)</h2>
+        <h2 id="movies-heading">Movies</h2>
+        <p class="muted" style="margin-top:8px">A quick list of movies and how I've rated them.</p>
 
-        <form id="addMovieForm" class="add-movie" aria-label="Add movie form">
-          <input id="movieTitle" type="text" placeholder="Movie title" aria-label="Movie title" required>
-          <input id="moviePoster" type="url" placeholder="Poster URL (optional)" aria-label="Poster URL">
-          <label for="movieRating" class="muted" style="margin-left:4px">Rating</label>
-          <input id="movieRating" type="range" min="0" max="10" step="1" value="7" aria-label="Initial rating">
-          <button class="btn" type="submit" aria-label="Add movie">Add</button>
-        </form>
+        <div class="movies-list" aria-live="polite">
+          <div class="movie-item" role="group" aria-label="Inception rating">
+            <div class="movie-left">
+              <div class="movie-thumb"><img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpeppermintiguana.co.uk%2Fwp-content%2Fuploads%2F2015%2F10%2Fwhiplash.34229.jpg&f=1&nofb=1&ipt=ea91435fb50b0d174848fd92e0f9d3e0d73524a943089a09a2ce71edee0f200f" alt="Whiplash poster" loading="lazy"></div>
+              <div class="movie-meta">
+                <div class="movie-title">Whiplash</div>
+                <div class="movie-sub">Damien Chazelle — Drama</div>
+              </div>
+            </div>
+            <div class="movie-rating" aria-hidden="false" aria-label="Rated 9 out of 10">9 / 10</div>
+          </div>
 
-        <div id="movieList" class="movie-list" style="margin-top:12px" aria-live="polite"></div>
+          <div class="movie-item" role="group" aria-label="The Matrix rating">
+            <div class="movie-left">
+              <div class="movie-thumb"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.themoviedb.org%2Ft%2Fp%2Foriginal%2FdXNAPwY7VrqMAo51EKhhCJfaGb5.jpg&f=1&nofb=1&ipt=7bb3f20269925f6fd22200026198cfbd1cad795b4610ba1f31842c7beab707dc" alt="The Matrix poster" loading="lazy"></div>
+              <div class="movie-meta">
+                <div class="movie-title">The Matrix</div>
+                <div class="movie-sub">Wachowskis — Sci-fi</div>
+              </div>
+            </div>
+            <div class="movie-rating" aria-label="Rated 8.2 out of 10">8.2 / 10</div>
+          </div>
+
+          <div class="movie-item" role="group" aria-label="Interstellar rating">
+            <div class="movie-left">
+              <div class="movie-thumb"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fc8.alamy.com%2Fcomp%2FP4WPM9%2Foriginal-film-title-interstellar-english-title-interstellar-film-director-christopher-nolan-year-2014-stars-matthew-mcconaughey-credit-warner-bros-album-P4WPM9.jpg&f=1&nofb=1&ipt=b7b88c1c642ec9562698054fc154c534f9c7cd9540acc83d0a79ab3439cf9e42" alt="Interstellar poster" loading="lazy"></div>
+              <div class="movie-meta">
+                <div class="movie-title">Interstellar</div>
+                <div class="movie-sub">Christopher Nolan — Drama / Sci-fi</div>
+              </div>
+            </div>
+            <div class="movie-rating" aria-label="Rated 9.92 out of 10">9.92 / 10</div>
+          </div>
+        </div>
       </section>
 
-      <!-- INTERESTS -->
-      <section id="interests" class="reveal" aria-labelledby="interests-heading">
-        <h2 id="interests-heading">Interests</h2>
-        <p class="muted" style="margin-top:8px">Fiction • Cooking • Music • Chess • AI</p>
-      </section>
-
-      <!-- CONTACT -->
+     
       <section id="contact" class="reveal" aria-labelledby="contact-heading">
         <h2 id="contact-heading">Contact</h2>
         <p class="muted" style="margin-top:8px">Want to work together or ask something? Send an email or connect on LinkedIn.</p>
@@ -555,23 +494,12 @@
     </footer>
   </div>
 
-  <!-- ALL JS (embedded) -->
+
   <script>
-    // ===== small utility: add current year =====
+    
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // ===== detect if device is touch-capable and toggle classes =====
-    (function detectTouch(){
-      const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
-      if(isTouch){
-        document.documentElement.classList.add('is-touch');
-        document.body.classList.add('is-touch');
-      } else {
-        document.documentElement.classList.add('no-touch');
-      }
-    })();
 
-    // ===== reveal on scroll using IntersectionObserver =====
     (function revealOnScroll(){
       const obs = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -584,25 +512,7 @@
 
       document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
     })();
-
-    // ===== smooth scroll for internal anchors (native fallback) =====
-    (function smoothAnchors(){
-      document.querySelectorAll('a[href^="#"]').forEach(a=>{
-        a.addEventListener('click', function(e){
-          const id = this.getAttribute('href');
-          if(id.length > 1){
-            e.preventDefault();
-            const target = document.querySelector(id);
-            if(target){
-              target.scrollIntoView({behavior:'smooth', block:'start'});
-              history.replaceState(null, '', id);
-            }
-          }
-        });
-      });
-    })();
-
-    // ===== hamburger toggle =====
+    
     (function hamburger(){
       const btn = document.querySelector('.menu-btn');
       const nav = document.getElementById('main-nav');
@@ -611,243 +521,43 @@
         const open = nav.classList.toggle('open');
         btn.setAttribute('aria-expanded', open ? 'true' : 'false');
       });
-      // close when clicking a link (mobile)
       nav.addEventListener('click', (e)=>{
         if(e.target.tagName === 'A' && window.innerWidth <= 820){
           nav.classList.remove('open');
           btn.setAttribute('aria-expanded','false');
         }
       });
+      window.addEventListener('resize', ()=>{
+        if(window.innerWidth > 820){
+          nav.classList.remove('open');
+          btn.setAttribute('aria-expanded','false');
+        }
+      });
     })();
-
-    // ===== hero parallax (subtle) and background parallax =====
-    (function parallax(){
-      if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      if(document.documentElement.classList.contains('is-touch')) return;
-
-      const hero = document.querySelector('.hero');
+    
+    (function respectsReducedMotion(){
+      if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        return;
+      }
+      const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+      if(isTouch) return;
       const heroInner = document.querySelector('.hero-inner');
-      const root = document.documentElement;
-      const strengthBg = Number(getComputedStyle(root).getPropertyValue('--bg-parallax-strength')) || 18;
-      const strengthStar = Number(getComputedStyle(root).getPropertyValue('--star-parallax-strength')) || 36;
-
-      let lastX = 0, lastY = 0, rafId = null;
-
-      function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
-
+      if(!heroInner) return;
+      let raf = null;
       document.addEventListener('mousemove', (e)=>{
         const w = window.innerWidth, h = window.innerHeight;
         const cx = (e.clientX - w/2) / (w/2); // -1..1
         const cy = (e.clientY - h/2) / (h/2);
-        // background smaller movement
-        const bgTx = clamp((-cx * strengthBg).toFixed(2), -strengthBg, strengthBg) + 'px';
-        const bgTy = clamp((-cy * strengthBg / 2).toFixed(2), -strengthBg, strengthBg) + 'px';
-        // star (foreground) larger movement for depth
-        const starX = clamp((-cx * strengthStar).toFixed(2), -strengthStar, strengthStar) + 'px';
-        const starY = clamp((-cy * strengthStar / 2).toFixed(2), -strengthStar, strengthStar) + 'px';
-        lastX = bgTx; lastY = bgTy;
-        // hero inner small translate but clamped
-        const heroTx = clamp((cx * 8).toFixed(1), -10, 10);
-        const heroTy = clamp((cy * 8).toFixed(1), -10, 10);
-        // throttle via rAF
-        if(rafId) cancelAnimationFrame(rafId);
-        rafId = requestAnimationFrame(()=>{
-          root.style.setProperty('--bg-tx', bgTx);
-          root.style.setProperty('--bg-ty', bgTy);
-          root.style.setProperty('--star-x', starX);
-          root.style.setProperty('--star-y', starY);
-          if(heroInner) heroInner.style.transform = `translate3d(${heroTx}px, ${heroTy}px, 0)`;
+        const tx = Math.max(-10, Math.min(10, cx * 8));
+        const ty = Math.max(-8, Math.min(8, cy * 6));
+        if(raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(()=> {
+          heroInner.style.transform = `translate3d(${tx}px, ${ty}px, 0)`;
         });
       });
-
-      // reset on leave/blur
-      document.addEventListener('mouseleave', ()=> {
-        root.style.setProperty('--bg-tx','0px');
-        root.style.setProperty('--bg-ty','0px');
-        root.style.setProperty('--star-x','0px');
-        root.style.setProperty('--star-y','0px');
-        if(heroInner) heroInner.style.transform = '';
-      });
-      window.addEventListener('blur', ()=> {
-        root.style.setProperty('--bg-tx','0px');
-        root.style.setProperty('--bg-ty','0px');
-        root.style.setProperty('--star-x','0px');
-        root.style.setProperty('--star-y','0px');
-        if(heroInner) heroInner.style.transform = '';
-      });
+      document.addEventListener('mouseleave', ()=> heroInner.style.transform = '');
+      window.addEventListener('blur', ()=> heroInner.style.transform = '');
     })();
-
-    // ===== accessibility: reduce motion fallback =====
-    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      document.querySelectorAll('.reveal').forEach(el => {
-        el.style.transition = 'none';
-        el.classList.add('show');
-      });
-      const bg = document.querySelector('.bg'); if(bg) bg.style.animation = 'none';
-      // remove parallax transforms
-      document.documentElement.style.setProperty('--bg-tx','0px');
-      document.documentElement.style.setProperty('--bg-ty','0px');
-      document.documentElement.style.setProperty('--star-x','0px');
-      document.documentElement.style.setProperty('--star-y','0px');
-    }
-
-    // ===== Movie List CRUD + localStorage =====
-    (function movieApp(){
-      const STORAGE_KEY = 'ag-movies-v1';
-      const movieListEl = document.getElementById('movieList');
-      const form = document.getElementById('addMovieForm');
-      const titleInput = document.getElementById('movieTitle');
-      const posterInput = document.getElementById('moviePoster');
-      const ratingInput = document.getElementById('movieRating');
-
-      // sample data
-      const defaults = [
-        { id: cryptoRandomId(), title: "Inception", poster: "", rating: 9 },
-        { id: cryptoRandomId(), title: "The Matrix", poster: "", rating: 9 },
-        { id: cryptoRandomId(), title: "Interstellar", poster: "", rating: 8 }
-      ];
-
-      function cryptoRandomId(){ return 'm_'+Math.random().toString(36).slice(2,9) }
-
-      function readStore(){
-        try{
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if(!raw) return null;
-          return JSON.parse(raw);
-        }catch(e){ console.error('movie parse err', e); return null }
-      }
-      function writeStore(data){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      }
-
-      function ensureInit(){
-        let data = readStore();
-        if(!data){
-          writeStore(defaults);
-          data = defaults;
-        }
-        return data;
-      }
-
-      function render(){
-        const items = ensureInit();
-        movieListEl.innerHTML = '';
-        items.forEach(item => {
-          const row = document.createElement('div'); row.className = 'movie-row';
-          row.setAttribute('data-id', item.id);
-
-          const thumb = document.createElement('div'); thumb.className = 'movie-thumb';
-          const img = document.createElement('img');
-          img.alt = item.title + ' poster';
-          img.loading = 'lazy';
-          img.src = item.poster || 'https://via.placeholder.com/120x180?text=Poster';
-          thumb.appendChild(img);
-
-          const meta = document.createElement('div'); meta.className = 'movie-meta';
-          const title = document.createElement('p'); title.className = 'movie-title'; title.textContent = item.title;
-          meta.appendChild(title);
-
-          const ratingRow = document.createElement('div'); ratingRow.className = 'rating-control';
-          // range input
-          const range = document.createElement('input');
-          range.type = 'range'; range.min = 0; range.max = 10; range.step = 1;
-          range.value = item.rating; range.setAttribute('aria-label', `Rating for ${item.title}`);
-          range.addEventListener('input', (e)=> {
-            updateRating(item.id, Number(e.target.value));
-          });
-
-          // rating bar visual
-          const barWrap = document.createElement('div'); barWrap.className = 'rating-bar';
-          const fill = document.createElement('div'); fill.className = 'rating-fill';
-          fill.style.width = (Number(item.rating) * 10) + '%';
-          barWrap.appendChild(fill);
-
-          const val = document.createElement('div'); val.className = 'rating-value'; val.textContent = item.rating + '/10';
-
-          ratingRow.appendChild(range);
-          ratingRow.appendChild(barWrap);
-          ratingRow.appendChild(val);
-
-          meta.appendChild(ratingRow);
-
-          // actions
-          const actions = document.createElement('div');
-          actions.style.display = 'flex'; actions.style.flexDirection = 'column'; actions.style.gap = '8px';
-          const delBtn = document.createElement('button'); delBtn.className = 'btn'; delBtn.type='button'; delBtn.textContent = 'Delete'; delBtn.setAttribute('aria-label', `Delete ${item.title}`);
-          delBtn.addEventListener('click', ()=> removeMovie(item.id));
-          actions.appendChild(delBtn);
-
-          row.appendChild(thumb);
-          row.appendChild(meta);
-          row.appendChild(actions);
-
-          movieListEl.appendChild(row);
-        });
-      }
-
-      function addMovie(obj){
-        const list = readStore() || [];
-        const entry = {
-          id: cryptoRandomId(),
-          title: obj.title,
-          poster: obj.poster || '',
-          rating: Number(obj.rating || 0)
-        };
-        list.unshift(entry);
-        writeStore(list);
-        render();
-      }
-
-      function updateRating(id, rating){
-        const list = readStore() || [];
-        const i = list.findIndex(x=>x.id===id);
-        if(i>=0){ list[i].rating = rating; writeStore(list); render(); }
-      }
-
-      function removeMovie(id){
-        let list = readStore() || [];
-        list = list.filter(x=>x.id !== id);
-        writeStore(list);
-        render();
-      }
-
-      // init
-      render();
-
-      // handle add form
-      form.addEventListener('submit', (e)=>{
-        e.preventDefault();
-        const title = titleInput.value.trim();
-        if(!title) { titleInput.focus(); return; }
-        addMovie({ title, poster: posterInput.value.trim(), rating: ratingInput.value });
-        form.reset();
-        ratingInput.value = 7;
-        titleInput.focus();
-      });
-    })();
-
-    // ===== hero subtle parallax reset when touch detected or small screens change =====
-    (function watchResize(){
-      window.addEventListener('resize', ()=>{
-        if(window.innerWidth <= 820){
-          document.getElementById('main-nav').classList.remove('open');
-          document.querySelector('.menu-btn')?.setAttribute('aria-expanded','false');
-        }
-      });
-    })();
-
-    // ===== keyboard accessibility: allow number keys to focus rating after tabbing to range (enhancement) =====
-    (function keyHints(){
-      document.addEventListener('keydown', (e)=>{
-        // if focus is on a range, allow +/- to change
-        const el = document.activeElement;
-        if(el && el.type === 'range'){
-          if(e.key === '+' || e.key === '=' ) { el.stepUp(); el.dispatchEvent(new Event('input')); e.preventDefault(); }
-          if(e.key === '-' || e.key === '_') { el.stepDown(); el.dispatchEvent(new Event('input')); e.preventDefault(); }
-        }
-      });
-    })();
-
   </script>
 </body>
 </html>
